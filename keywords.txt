@@ -1,0 +1,50 @@
+#######################################
+# Syntax Coloring Map For MidiLeds
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+AdsrEnvelope	KEYWORD1
+MidiNoteColors	KEYWORD1
+MidiColorMapper	KEYWORD1
+MidiLeds	KEYWORD1
+MidiSoftPedal	KEYWORD1
+MidiDamperPedal	KEYWORD1
+MidiSostenutoPedal	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+noteOn	KEYWORD2
+noteOff	KEYWORD2
+tick	KEYWORD2
+getOutput	KEYWORD2
+get	KEYWORD2
+setMapper	KEYWORD2
+setNoteColorMap	KEYWORD2
+map	KEYWORD2
+getAttackTime	KEYWORD2
+getDecayTime	KEYWORD2
+getSustainLevel	KEYWORD2
+getReleaseTime	KEYWORD2
+getColorMapper	KEYWORD2
+getNoteColorMap	KEYWORD2
+getIgnoreVelocity	KEYWORD2
+getBaseBrightness	KEYWORD2
+setAttackTime	KEYWORD2
+setDecayTime	KEYWORD2
+setSustainLevel	KEYWORD2
+setReleaseTime	KEYWORD2
+setColorMapper	KEYWORD2
+setIgnoreVelocity	KEYWORD2
+setBaseBrightness	KEYWORD2
+allNotesOff	KEYWORD2
+resetAllControllers	KEYWORD2
+setSoftenFactor	KEYWORD2
+press	KEYWORD2
+release	KEYWORD2
+setHandleNoteOn	KEYWORD2
+setHandleNoteOff	KEYWORD2
