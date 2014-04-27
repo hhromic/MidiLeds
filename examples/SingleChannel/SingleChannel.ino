@@ -100,17 +100,17 @@ void sostenutoNoteOff(uint8_t channel, uint8_t note) {
 }
 
 //***********************************************************************
-// Message handlers for MIDI input
+// Message handlers for MIDI input (channel comes in 1..16 range)
 
 void onNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
     if (channel == NOTES_CHANNEL)
-        damperPedal.noteOn(channel, note, velocity);
+        damperPedal.noteOn(channel - 1, note, velocity);
     digitalWrite(STATUS_LED_PIN, LOW);
 }
 
 void onNoteOff(uint8_t channel, uint8_t note, uint8_t velocity) {
     if (channel == NOTES_CHANNEL)
-        damperPedal.noteOff(channel, note);
+        damperPedal.noteOff(channel - 1, note);
     digitalWrite(STATUS_LED_PIN, LOW);
 }
 
@@ -167,16 +167,16 @@ void onControlChange(uint8_t channel, uint8_t control, uint8_t value)  {
     if (channel == NOTES_CHANNEL) {
         switch (control) {
             case 0x40: // Damper Pedal
-                if (value < 0x40) damperPedal.release(channel);
-                else damperPedal.press(channel);
+                if (value < 0x40) damperPedal.release(channel - 1);
+                else damperPedal.press(channel - 1);
                 break;
             case 0x42: // Sostenuto Pedal
-                if (value < 0x40) sostenutoPedal.release(channel);
-                else sostenutoPedal.press(channel);
+                if (value < 0x40) sostenutoPedal.release(channel - 1);
+                else sostenutoPedal.press(channel - 1);
                 break;
             case 0x43: // Soft Pedal
-                if (value < 0x40) softPedal.release(channel);
-                else softPedal.press(channel);
+                if (value < 0x40) softPedal.release(channel - 1);
+                else softPedal.press(channel - 1);
                 break;
         }
     }
