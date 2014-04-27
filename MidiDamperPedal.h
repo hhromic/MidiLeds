@@ -13,17 +13,19 @@
 class MidiDamperPedal {
     public:
         MidiDamperPedal();
-        void press(void);
-        void release(void);
-        void noteOn(uint8_t note, uint8_t velocity);
-        void noteOff(uint8_t note);
-        void setHandleNoteOn(void (*fptr)(uint8_t note, uint8_t velocity));
-        void setHandleNoteOff(void (*fptr)(uint8_t note));
+        void press(uint8_t channel);
+        void release(uint8_t channel);
+        void noteOn(uint8_t channel, uint8_t note, uint8_t velocity);
+        void noteOff(uint8_t channel, uint8_t note);
+        void setHandleNoteOn(void (*fptr)(uint8_t channel, uint8_t note, uint8_t velocity));
+        void setHandleNoteOff(void (*fptr)(uint8_t channel, uint8_t note));
     private:
-        bool pedalPressed;
-        bool heldNotes[128];
-        void (*handleNoteOn)(uint8_t note, uint8_t velocity);
-        void (*handleNoteOff)(uint8_t note);
+        struct {
+            bool pressed;
+            bool heldNotes[128];
+        } pedals[16];
+        void (*handleNoteOn)(uint8_t channel, uint8_t note, uint8_t velocity);
+        void (*handleNoteOff)(uint8_t channel, uint8_t note);
 };
 
 #endif

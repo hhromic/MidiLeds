@@ -14,14 +14,16 @@ class MidiSoftPedal {
     public:
         MidiSoftPedal();
         void setSoftenFactor(float factor);
-        void press(void);
-        void release(void);
-        void noteOn(uint8_t note, uint8_t velocity);
-        void setHandleNoteOn(void (*fptr)(uint8_t note, uint8_t velocity));
+        void press(uint8_t channel);
+        void release(uint8_t channel);
+        void noteOn(uint8_t channel, uint8_t note, uint8_t velocity);
+        void setHandleNoteOn(void (*fptr)(uint8_t channel, uint8_t note, uint8_t velocity));
     private:
         float softenFactor;
-        bool pedalPressed;
-        void (*handleNoteOn)(uint8_t note, uint8_t velocity);
+        struct {
+            bool pressed;
+        } pedals[16];
+        void (*handleNoteOn)(uint8_t channel, uint8_t note, uint8_t velocity);
 };
 
 #endif

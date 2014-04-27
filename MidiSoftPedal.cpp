@@ -4,7 +4,8 @@
 // Class constructor
 MidiSoftPedal::MidiSoftPedal() {
     softenFactor = 2.0f / 3.0f;
-    pedalPressed = false;
+    for (size_t i=0; i<16; i++)
+        pedals[i].pressed = false;
     handleNoteOn = NULL;
 }
 
@@ -14,24 +15,24 @@ void MidiSoftPedal::setSoftenFactor(float factor) {
 }
 
 // Emulate the pedal being pressed
-void MidiSoftPedal::press(void) {
-    pedalPressed = true;
+void MidiSoftPedal::press(uint8_t channel) {
+    pedals[channel & 0xF].pressed = true;
 }
 
 // Emulate the pedal being released
-void MidiSoftPedal::release(void) {
-    pedalPressed = false;
+void MidiSoftPedal::release(uint8_t channel) {
+    pedals[channel & 0xF].pressed = false;
 }
 
 // Process a MIDI Note On message
-void MidiSoftPedal::noteOn(uint8_t note, uint8_t velocity) {
-    uint8_t newVelocity = velocity;
-    if (pedalPressed)
-        newVelocity = round(velocity * softenFactor);
-    handleNoteOn(note, newVelocity);
+void MidiSoftPedal::noteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
+    if (pedals[channel & 0xF].pressed)
+        handleNoteOn(channel, note, round(velocity * softenFactor));
+    else
+        handleNoteOn(channel, note, velocity);
 }
 
 // Set a handler for processed Note On messages
-void MidiSoftPedal::setHandleNoteOn(void (*fptr)(uint8_t note, uint8_t velocity)) {
+void MidiSoftPedal::setHandleNoteOn(void (*fptr)(uint8_t channel, uint8_t note, uint8_t velocity)) {
     handleNoteOn = fptr;
 }

@@ -76,23 +76,23 @@ void loop() {
 //***********************************************************************
 // Message handlers for the pedals
 
-void damperNoteOn(uint8_t note, uint8_t velocity) {
-    softPedal.noteOn(note, velocity);
+void damperNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
+    softPedal.noteOn(channel, note, velocity);
 }
 
-void damperNoteOff(uint8_t note) {
-    sostenutoPedal.noteOff(note);
+void damperNoteOff(uint8_t channel, uint8_t note) {
+    sostenutoPedal.noteOff(channel, note);
 }
 
-void softNoteOn(uint8_t note, uint8_t velocity) {
-    sostenutoPedal.noteOn(note, velocity);
+void softNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
+    sostenutoPedal.noteOn(channel, note, velocity);
 }
 
-void sostenutoNoteOn(uint8_t note, uint8_t velocity) {
+void sostenutoNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
     midiLeds.noteOn(note, velocity);
 }
 
-void sostenutoNoteOff(uint8_t note) {
+void sostenutoNoteOff(uint8_t channel, uint8_t note) {
     midiLeds.noteOff(note);
 }
 
@@ -101,13 +101,13 @@ void sostenutoNoteOff(uint8_t note) {
 
 void onNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
     if (channel == NOTES_CHANNEL)
-        damperPedal.noteOn(note, velocity);
+        damperPedal.noteOn(channel, note, velocity);
     digitalWrite(STATUS_LED_PIN, LOW);
 }
 
 void onNoteOff(uint8_t channel, uint8_t note, uint8_t velocity) {
     if (channel == NOTES_CHANNEL)
-        damperPedal.noteOff(note);
+        damperPedal.noteOff(channel, note);
     digitalWrite(STATUS_LED_PIN, LOW);
 }
 
@@ -164,16 +164,16 @@ void onControlChange(uint8_t channel, uint8_t control, uint8_t value)  {
     if (channel == NOTES_CHANNEL) {
         switch (control) {
             case 0x40: // Damper Pedal
-                if (value < 0x40) damperPedal.release();
-                else damperPedal.press();
+                if (value < 0x40) damperPedal.release(channel);
+                else damperPedal.press(channel);
                 break;
             case 0x42: // Sostenuto Pedal
-                if (value < 0x40) sostenutoPedal.release();
-                else sostenutoPedal.press();
+                if (value < 0x40) sostenutoPedal.release(channel);
+                else sostenutoPedal.press(channel);
                 break;
             case 0x43: // Soft Pedal
-                if (value < 0x40) softPedal.release();
-                else softPedal.press();
+                if (value < 0x40) softPedal.release(channel);
+                else softPedal.press(channel);
                 break;
         }
     }
@@ -184,8 +184,8 @@ void onControlChange(uint8_t channel, uint8_t control, uint8_t value)  {
 // Quickly send Note On and Note Off messages to re-init Leds
 
 void initNotes() {
-  for (uint8_t i=NOTE_MIN; i<=NOTE_MAX; i++) {
-    midiLeds.noteOn(i, 0x00);
-    midiLeds.noteOff(i);
-  }
+    for (uint8_t i=NOTE_MIN; i<=NOTE_MAX; i++) {
+        midiLeds.noteOn(i, 0x00);
+        midiLeds.noteOff(i);
+    }
 }
