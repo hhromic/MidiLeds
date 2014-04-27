@@ -26,6 +26,7 @@ class MidiLeds {
         unsigned long getReleaseTime(void);
         MidiColorMapper::Mappers getColorMapper(void);
         MidiNoteColors::Maps getNoteColorMap(void);
+        uint8_t getFixedHue(void);
         bool getIgnoreVelocity(void);
         uint8_t getBaseBrightness(void);
 
@@ -36,6 +37,7 @@ class MidiLeds {
         void setReleaseTime(unsigned long releaseTime);
         void setColorMapper(MidiColorMapper::Mappers colorMapper);
         void setNoteColorMap(MidiNoteColors::Maps noteColorMap);
+        void setFixedHue(uint8_t hue);
         void setIgnoreVelocity(bool state);
         void setBaseBrightness(uint8_t value);
 
@@ -59,6 +61,7 @@ class MidiLeds {
             unsigned long releaseTime;
             MidiColorMapper::Mappers colorMapper;
             MidiNoteColors::Maps noteColorMap;
+            uint8_t fixedHue;
             bool ignoreVelocity;
             uint8_t baseBrightness;
         } parameters;
@@ -69,6 +72,7 @@ class MidiLeds {
             .releaseTime = 400U,
             .colorMapper = MidiColorMapper::COLOR_MAP,
             .noteColorMap = MidiNoteColors::NEWTON_1704,
+            .fixedHue = 0x00,
             .ignoreVelocity = true,
             .baseBrightness = 0x00,
         };

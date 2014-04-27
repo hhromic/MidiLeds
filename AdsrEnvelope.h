@@ -16,6 +16,7 @@ class AdsrEnvelope {
         void noteOff(void);
         void tick(unsigned long time);
         float getOutput(void);
+        bool isIdle(void);
     private:
         enum States { IDLE, ATTACK, DECAY, SUSTAIN, RELEASE };
         struct Data {

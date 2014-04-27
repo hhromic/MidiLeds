@@ -90,3 +90,8 @@ void AdsrEnvelope::tick(unsigned long time) {
 float AdsrEnvelope::getOutput(void) {
     return data.output;
 }
+
+// Return true if the ADSR envelope is in IDLE state, or false otherwise
+bool AdsrEnvelope::isIdle(void) {
+    return data.state == AdsrEnvelope::IDLE;
+}

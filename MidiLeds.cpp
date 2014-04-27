@@ -20,6 +20,7 @@ float MidiLeds::getSustainLevel(void) { return parameters.sustainLevel; }
 unsigned long MidiLeds::getReleaseTime(void) { return parameters.releaseTime; }
 MidiColorMapper::Mappers MidiLeds::getColorMapper(void) { return parameters.colorMapper; }
 MidiNoteColors::Maps MidiLeds::getNoteColorMap(void) { return parameters.noteColorMap; }
+uint8_t MidiLeds::getFixedHue(void) { return parameters.fixedHue; }
 bool MidiLeds::getIgnoreVelocity(void) { return parameters.ignoreVelocity; }
 uint8_t MidiLeds::getBaseBrightness(void) { return parameters.baseBrightness; }
 
@@ -35,6 +36,10 @@ void MidiLeds::setColorMapper(MidiColorMapper::Mappers colorMapper) {
 void MidiLeds::setNoteColorMap(MidiNoteColors::Maps noteColorMap) {
     parameters.noteColorMap = noteColorMap;
     colorMapper->setNoteColorMap(noteColorMap);
+}
+void MidiLeds::setFixedHue(uint8_t hue) {
+    parameters.fixedHue = hue;
+    colorMapper->setFixedHue(hue);
 }
 void MidiLeds::setIgnoreVelocity(bool state) { parameters.ignoreVelocity = state; }
 void MidiLeds::setBaseBrightness(uint8_t value) { parameters.baseBrightness = value; }
@@ -69,6 +74,8 @@ void MidiLeds::resetAllControllers(void) {
 // Process a clock tick
 void MidiLeds::tick(unsigned long time) {
     for (size_t i=0; i<(noteMax - noteMin + 1); i++) {
+        if (adsrEnvelopes[i].isIdle())
+            continue;
         adsrEnvelopes[i].tick(time);
         uint8_t brightness = round(adsrEnvelopes[i].getOutput() * hsvData[i].v);
         if (brightness < parameters.baseBrightness)

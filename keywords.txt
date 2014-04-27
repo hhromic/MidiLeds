@@ -22,6 +22,7 @@ noteOn	KEYWORD2
 noteOff	KEYWORD2
 tick	KEYWORD2
 getOutput	KEYWORD2
+isIdle	KEYWORD2
 get	KEYWORD2
 setMapper	KEYWORD2
 setNoteColorMap	KEYWORD2
@@ -32,6 +33,7 @@ getSustainLevel	KEYWORD2
 getReleaseTime	KEYWORD2
 getColorMapper	KEYWORD2
 getNoteColorMap	KEYWORD2
+getFixedHue	KEYWORD2
 getIgnoreVelocity	KEYWORD2
 getBaseBrightness	KEYWORD2
 setAttackTime	KEYWORD2
@@ -39,6 +41,7 @@ setDecayTime	KEYWORD2
 setSustainLevel	KEYWORD2
 setReleaseTime	KEYWORD2
 setColorMapper	KEYWORD2
+setFixedHue	KEYWORD2
 setIgnoreVelocity	KEYWORD2
 setBaseBrightness	KEYWORD2
 allNotesOff	KEYWORD2

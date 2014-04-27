@@ -7,6 +7,7 @@ MidiColorMapper::MidiColorMapper(uint8_t noteMin, uint8_t noteMax) {
     this->noteMax = noteMax;
     this->mapper = COLOR_MAP;
     this->noteColorMap = MidiNoteColors::SCRIABIN_1911;
+    this->fixedHue = 0x00;
 }
 
 // Set the active color mapper to use
@@ -17,6 +18,11 @@ void MidiColorMapper::setMapper(Mappers mapper) {
 // Set the active note color map to use
 void MidiColorMapper::setNoteColorMap(MidiNoteColors::Maps noteColorMap) {
     this->noteColorMap = noteColorMap;
+}
+
+// Set the fixed color hue to use
+void MidiColorMapper::setFixedHue(uint8_t hue) {
+    this->fixedHue = hue;
 }
 
 // Map a MIDI note to an HSV color
@@ -32,6 +38,9 @@ struct CHSV MidiColorMapper::map(uint8_t note, uint8_t velocity) {
                 round((note - noteMin) * (0xFF / (noteMax - noteMin + 1.0f))),
                 0xFF, round((velocity * 1.0f / 0x7F) * 0xFF)
             );
+            break;
+        case FIXED_COLOR: // Fixed color mapping
+            noteColor = CHSV(fixedHue, 0xFF, round((velocity * 1.0f / 0x7F) * 0xFF));
             break;
     };
     return noteColor;
