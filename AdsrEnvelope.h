@@ -14,9 +14,8 @@ class AdsrEnvelope {
         AdsrEnvelope();
         void noteOn(unsigned long attackTime, unsigned long decayTime, float sustainLevel, unsigned long releaseTime);
         void noteOff(void);
-        void tick(unsigned long time);
+        bool tick(unsigned long time);
         float getOutput(void);
-        bool isIdle(void);
     private:
         enum States { IDLE, ATTACK, DECAY, SUSTAIN, RELEASE };
         struct Data {

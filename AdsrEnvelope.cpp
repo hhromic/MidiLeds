@@ -43,9 +43,10 @@ void AdsrEnvelope::noteOff(void) {
 }
 
 // Update the ADSR envelope phase and output value (assumes monotonically increasing time)
-void AdsrEnvelope::tick(unsigned long time) {
+// Returns false if the ADSR envelope is in IDLE state, false otherwise
+bool AdsrEnvelope::tick(unsigned long time) {
     // Do nothing if the envelope is idle
-    if (data.state == AdsrEnvelope::IDLE) return;
+    if (data.state == AdsrEnvelope::IDLE) return false;
 
     // Handle envelope relative time
     if (data.lastTime == 0U)
@@ -63,7 +64,7 @@ void AdsrEnvelope::tick(unsigned long time) {
                 data.output = data.target;
                 data.target = data.sustainLevel;
             }
-            return;
+            return true;
         case AdsrEnvelope::DECAY: // Decay phase
             data.output = std::isinf(data.decayRate) ? data.target : data.decayStart - (relativeTime * data.decayRate);
             if (data.output <= data.target) { // Change to sustain phase?
@@ -71,10 +72,10 @@ void AdsrEnvelope::tick(unsigned long time) {
                 data.lastTime = 0U;
                 data.output = data.target;
             }
-            return;
+            return true;
         case AdsrEnvelope::SUSTAIN: // Sustain phase
             data.lastTime = 0U;
-            return;
+            return true;
         case AdsrEnvelope::RELEASE: // Release phase
             data.output = std::isinf(data.releaseRate) ? data.target : data.releaseStart - (relativeTime * data.releaseRate);
             if (data.output <= data.target) { // Change to idle phase?
@@ -82,16 +83,11 @@ void AdsrEnvelope::tick(unsigned long time) {
                 data.lastTime = 0U;
                 data.output = data.target;
             }
-            return;
+            return true;
     }
 }
 
 // Get the current ADSR envelope output value
 float AdsrEnvelope::getOutput(void) {
     return data.output;
-}
-
-// Return true if the ADSR envelope is in IDLE state, or false otherwise
-bool AdsrEnvelope::isIdle(void) {
-    return data.state == AdsrEnvelope::IDLE;
 }

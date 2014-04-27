@@ -14,8 +14,10 @@
 
 class MidiColorMapper {
     public:
+        MidiColorMapper();
         enum Mappers { COLOR_MAP, RAINBOW, FIXED_COLOR };
-        MidiColorMapper(uint8_t noteMin, uint8_t noteMax);
+        void setNoteMin(uint8_t noteMin);
+        void setNoteMax(uint8_t noteMax);
         void setMapper(Mappers mapper);
         void setNoteColorMap(MidiNoteColors::Maps noteColorMap);
         void setFixedHue(uint8_t hue);

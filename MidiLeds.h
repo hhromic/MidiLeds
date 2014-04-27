@@ -54,9 +54,9 @@ class MidiLeds {
         uint8_t noteMin;
         uint8_t noteMax;
         struct CRGB *leds;
-        struct CHSV *hsvData;
-        AdsrEnvelope *adsrEnvelopes;
-        MidiColorMapper *colorMapper;
+        struct CHSV hsvData[128];
+        AdsrEnvelope adsrEnvelopes[128];
+        MidiColorMapper midiColorMapper;
         struct MidiLedsParameters {
             unsigned long attackTime;
             unsigned long decayTime;

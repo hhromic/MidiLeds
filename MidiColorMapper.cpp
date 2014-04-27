@@ -2,12 +2,22 @@
 #include <MidiColorMapper.h>
 
 // Class constructor
-MidiColorMapper::MidiColorMapper(uint8_t noteMin, uint8_t noteMax) {
-    this->noteMin = noteMin;
-    this->noteMax = noteMax;
+MidiColorMapper::MidiColorMapper() {
+    this->noteMin = 0x00;
+    this->noteMax = 0x7F;
     this->mapper = COLOR_MAP;
-    this->noteColorMap = MidiNoteColors::SCRIABIN_1911;
+    this->noteColorMap = MidiNoteColors::NEWTON_1704;
     this->fixedHue = 0x00;
+}
+
+// Set minimum note
+void MidiColorMapper::setNoteMin(uint8_t noteMin) {
+    this->noteMin = noteMin;
+}
+
+// Set maximum note
+void MidiColorMapper::setNoteMax(uint8_t notemax) {
+    this->noteMax = noteMax;
 }
 
 // Set the active color mapper to use
