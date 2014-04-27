@@ -2,7 +2,10 @@
 #include <MidiLeds.h>
 
 // Class constructor
-MidiLeds::MidiLeds(struct CRGB *leds, uint8_t noteMin, uint8_t noteMax) {
+MidiLeds::MidiLeds() {}
+
+// Use LEDs array with given noteMin and noteMax limits
+void MidiLeds::useLeds(struct CRGB *leds, uint8_t noteMin, uint8_t noteMax) {
     this->noteMin = noteMin;
     this->noteMax = noteMax;
     this->leds = leds;

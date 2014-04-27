@@ -17,7 +17,10 @@
 
 class MidiLeds {
     public:
-        MidiLeds(struct CRGB *leds, uint8_t noteMin, uint8_t noteMax);
+        MidiLeds();
+
+        // Configuration
+        void useLeds(struct CRGB *leds, uint8_t noteMin, uint8_t noteMax);
 
         // Parameter getters
         unsigned long getAttackTime(void);

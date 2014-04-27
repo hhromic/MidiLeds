@@ -34,7 +34,7 @@
 
 elapsedMillis elapsedTime;
 CRGB leds[NUM_LEDS];
-MidiLeds midiLeds(leds, NOTE_MIN, NOTE_MAX);
+MidiLeds midiLeds;
 MidiDamperPedal damperPedal;
 MidiDamperPedal softPedal;
 MidiDamperPedal sostenutoPedal;
@@ -53,6 +53,9 @@ void setup() {
     FastLED.setDither(0);
     FastLED.setCorrection(TypicalSMD5050);
     
+    // Init MidiLeds
+    midiLeds.useLeds(leds, NOTE_MIN, NOTE_MAX);
+
     // Init pedals handlers
     damperPedal.setHandleNoteOn(damperNoteOn);
     damperPedal.setHandleNoteOff(damperNoteOff);

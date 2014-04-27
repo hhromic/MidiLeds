@@ -27,6 +27,7 @@ get	KEYWORD2
 setMapper	KEYWORD2
 setNoteColorMap	KEYWORD2
 map	KEYWORD2
+useLeds	KEYWORD2
 getAttackTime	KEYWORD2
 getDecayTime	KEYWORD2
 getSustainLevel	KEYWORD2
