@@ -20,20 +20,35 @@
 #include <MidiSoftPedal.h>
 #include <MidiSostenutoPedal.h>
 
-#define DATA_PIN 2          // LED strip data pin
-#define STATUS_LED_PIN 13   // Teensy 3.1 onboard LED
-#define NOTE_MIN 0x15       // note 21 (first note on standard 88 keys keyboard)
-#define NOTE_MAX 0x6C       // note 108 (last note on standard 88 keys keyboard)
-#define NOTES_CHANNEL 1     // What MIDI channel to listen for notes and pedals?
-#define CONTROL_CHANNEL 16  // What MIDI channel to listen for parameter control?
-#define TIME_RANGE 5000     // Time range for setting parameters from MIDI control messages
-#define NUM_LEDS (NOTE_MAX - NOTE_MIN + 1)
+// Program configuration
+#define DATA_PIN 2         // LED strip data pin
+#define STATUS_LED_PIN 13  // Teensy 3.1 onboard LED
+#define MIDI_CHANNEL 1     // What MIDI channel to listen for (1..16)?
+#define NOTE_MIN 0x15      // note 21 (first note on standard 88 keys keyboard)
+#define NOTE_MAX 0x6C      // note 108 (last note on standard 88 keys keyboard)
+#define TIME_RANGE 5000    // Time range for setting parameters from MIDI control messages
+
+// MIDI Control Change (CC) control bytes definitions
+#define CC_COLOR_MAPPER           0x14
+#define CC_NOTE_COLOR_MAP         0x15
+#define CC_FIXED_HUE              0x16
+#define CC_ATTACK_TIME            0x17
+#define CC_DECAY_TIME             0x18
+#define CC_SUSTAIN_LEVEL          0x19
+#define CC_RELEASE_TIME           0x1A
+#define CC_IGNORE_VELOCITY        0x1B
+#define CC_BASE_BRIGHTNESS        0x1C
+#define CC_ALL_NOTES_OFF          0x7B
+#define CC_RESET_ALL_CONTROLLERS  0x79
+#define CC_DAMPER_PEDAL           0x40
+#define CC_SOFT_PEDAL             0x42
+#define CC_SOSTENUTO_PEDAL        0x43
 
 //***********************************************************************
 // Global objects
 
 elapsedMillis elapsedTime;
-CRGB leds[NUM_LEDS];
+CRGB leds[NOTE_MAX - NOTE_MIN + 1];
 MidiLeds midiLeds;
 MidiDamperPedal damperPedal;
 MidiDamperPedal softPedal;
@@ -49,7 +64,7 @@ void setup() {
     pinMode(STATUS_LED_PIN, OUTPUT);
 
     // Init FastLED
-    FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
+    FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NOTE_MAX - NOTE_MIN + 1);
     FastLED.setDither(0);
     FastLED.setCorrection(TypicalSMD5050);
     
@@ -100,32 +115,31 @@ void sostenutoNoteOff(uint8_t channel, uint8_t note) {
 }
 
 //***********************************************************************
-// Message handlers for MIDI input (channel comes in 1..16 range)
+// Message handlers for MIDI input (channel here comes in 1..16 range)
 
 void onNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
-    if (channel == NOTES_CHANNEL)
+    if (channel == MIDI_CHANNEL)
         damperPedal.noteOn(channel - 1, note, velocity);
     digitalWrite(STATUS_LED_PIN, LOW);
 }
 
 void onNoteOff(uint8_t channel, uint8_t note, uint8_t velocity) {
-    if (channel == NOTES_CHANNEL)
+    if (channel == MIDI_CHANNEL)
         damperPedal.noteOff(channel - 1, note);
     digitalWrite(STATUS_LED_PIN, LOW);
 }
 
 void onControlChange(uint8_t channel, uint8_t control, uint8_t value)  {
-    // Process control channel controls
-    if (channel == CONTROL_CHANNEL) {
+    if (channel == MIDI_CHANNEL) {
         switch (control) {
-            case 0x00: // Bank Select
+            case CC_COLOR_MAPPER:
                 switch (value) {
                     case 0x00: midiLeds.setColorMapper(MidiColorMapper::COLOR_MAP); initNotes(); break;
                     case 0x01: midiLeds.setColorMapper(MidiColorMapper::RAINBOW); initNotes(); break;
                     case 0x02: midiLeds.setColorMapper(MidiColorMapper::FIXED_COLOR); initNotes(); break;
                 }
                 break;
-            case 0x20: // Bank Select (fine)
+            case CC_NOTE_COLOR_MAP:
                 switch (value) {
                     case 0x00: midiLeds.setNoteColorMap(MidiNoteColors::AEPPLI_1940); initNotes(); break;
                     case 0x01: midiLeds.setNoteColorMap(MidiNoteColors::BELMONT_1944); initNotes(); break;
@@ -142,41 +156,26 @@ void onControlChange(uint8_t channel, uint8_t control, uint8_t value)  {
                     case 0x0C: midiLeds.setNoteColorMap(MidiNoteColors::ZIEVERINK_2004); initNotes(); break;
                 }
                 break;
-            case 0x4D: // Vibrato Depth
-                midiLeds.setFixedHue(round(0xFF * (value * 1.0f / 0x7F))); initNotes(); break;
-            case 0x49: // Attack Time
-                midiLeds.setAttackTime(round(TIME_RANGE * (value * 1.0f / 0x7F))); break;
-            case 0x4B: // Decay Time
-                midiLeds.setDecayTime(round(TIME_RANGE * (value * 1.0f / 0x7F))); break;
-            case 0x46: // Sound Variation
-                midiLeds.setSustainLevel(1.0f * (value * 1.0f / 0x7F)); break;
-            case 0x48: // Release Time
-                midiLeds.setReleaseTime(round(TIME_RANGE * (value * 1.0f / 0x7F))); break;
-            case 0x47: // Timbre Intensity
-                midiLeds.setIgnoreVelocity(value < 0x40 ? false : true); break;
-            case 0x4A: // Brightness
-                midiLeds.setBaseBrightness(value); initNotes(); break;
-            case 0x7B: // All Notes Off
-                midiLeds.allNotesOff(); break;
-            case 0x79: // Reset All Controllers
-                midiLeds.resetAllControllers(); break;
-        }
-    }
-    
-    // Process notes channel controls
-    if (channel == NOTES_CHANNEL) {
-        switch (control) {
-            case 0x40: // Damper Pedal
+            case CC_FIXED_HUE: midiLeds.setFixedHue(round(0xFF * (value * 1.0f / 0x7F))); initNotes(); break;
+            case CC_ATTACK_TIME: midiLeds.setAttackTime(round(TIME_RANGE * (value * 1.0f / 0x7F))); break;
+            case CC_DECAY_TIME: midiLeds.setDecayTime(round(TIME_RANGE * (value * 1.0f / 0x7F))); break;
+            case CC_SUSTAIN_LEVEL: midiLeds.setSustainLevel(1.0f * (value * 1.0f / 0x7F)); break;
+            case CC_RELEASE_TIME: midiLeds.setReleaseTime(round(TIME_RANGE * (value * 1.0f / 0x7F))); break;
+            case CC_IGNORE_VELOCITY: midiLeds.setIgnoreVelocity(value < 0x40 ? false : true); break;
+            case CC_BASE_BRIGHTNESS: midiLeds.setBaseBrightness(value); initNotes(); break;
+            case CC_ALL_NOTES_OFF: midiLeds.allNotesOff(); break;
+            case CC_RESET_ALL_CONTROLLERS: midiLeds.resetAllControllers(); break;
+            case CC_DAMPER_PEDAL:
                 if (value < 0x40) damperPedal.release(channel - 1);
                 else damperPedal.press(channel - 1);
                 break;
-            case 0x42: // Sostenuto Pedal
-                if (value < 0x40) sostenutoPedal.release(channel - 1);
-                else sostenutoPedal.press(channel - 1);
-                break;
-            case 0x43: // Soft Pedal
+            case CC_SOFT_PEDAL:
                 if (value < 0x40) softPedal.release(channel - 1);
                 else softPedal.press(channel - 1);
+                break;
+            case CC_SOSTENUTO_PEDAL:
+                if (value < 0x40) sostenutoPedal.release(channel - 1);
+                else sostenutoPedal.press(channel - 1);
                 break;
         }
     }
