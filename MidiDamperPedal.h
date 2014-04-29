@@ -20,10 +20,8 @@ class MidiDamperPedal {
         void setHandleNoteOn(void (*fptr)(uint8_t channel, uint8_t note, uint8_t velocity));
         void setHandleNoteOff(void (*fptr)(uint8_t channel, uint8_t note));
     private:
-        struct {
-            bool pressed;
-            bool heldNotes[128];
-        } pedals[16];
+        uint16_t pressed;
+        uint32_t heldNotes[16][4];
         void (*handleNoteOn)(uint8_t channel, uint8_t note, uint8_t velocity);
         void (*handleNoteOff)(uint8_t channel, uint8_t note);
 };

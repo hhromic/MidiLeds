@@ -4,29 +4,29 @@
 // Class constructor
 MidiSoftPedal::MidiSoftPedal() {
     softenFactor = 2.0f / 3.0f;
-    for (size_t i=0; i<16; i++)
-        pedals[i].pressed = false;
+    pressed = 0x0000;
     handleNoteOn = NULL;
 }
 
-// Set the soften factor to apply to the note velocities
+// Set the soften factor to apply to the note velocities (must be <= 1)
 void MidiSoftPedal::setSoftenFactor(float factor) {
-    softenFactor = factor;
+    if (softenFactor <= 1.0f)
+        softenFactor = factor;
 }
 
 // Emulate the pedal being pressed
 void MidiSoftPedal::press(uint8_t channel) {
-    pedals[channel & 0xF].pressed = true;
+    bitSet(pressed, channel & 0xF);
 }
 
 // Emulate the pedal being released
 void MidiSoftPedal::release(uint8_t channel) {
-    pedals[channel & 0xF].pressed = false;
+    bitClear(pressed, channel & 0xF);
 }
 
 // Process a MIDI Note On message
 void MidiSoftPedal::noteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
-    if (pedals[channel & 0xF].pressed)
+    if (bitRead(pressed, channel & 0xF))
         handleNoteOn(channel, note, round(velocity * softenFactor));
     else
         handleNoteOn(channel, note, velocity);

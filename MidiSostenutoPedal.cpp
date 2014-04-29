@@ -2,33 +2,31 @@
 
 // Class constructor
 MidiSostenutoPedal::MidiSostenutoPedal() {
-    for (size_t i=0; i<16; i++) {
-        pedals[i].pressed = false;
-        for (size_t j=0; j<128; j++) {
-            pedals[i].prePedalNotes[j] = false;
-            pedals[i].pedalNotes[j] = false;
-            pedals[i].heldNotes[j] = false;
+    pressed = 0x0000;
+    for (size_t i=0; i<16; i++)
+        for (size_t j=0; j<4; j++) {
+            prePedalNotes[i][j] = 0x00000000;
+            pedalNotes[i][j] = 0x00000000;
+            heldNotes[i][j] = 0x00000000;
         }
-    }
     handleNoteOn = NULL;
     handleNoteOff = NULL;
 }
 
 // Emulate the pedal being pressed
 void MidiSostenutoPedal::press(uint8_t channel) {
-    pedals[channel & 0xF].pressed = true;
-    for (size_t i=0; i<128; i++)
-        if (pedals[channel & 0xF].prePedalNotes[i])
-            pedals[channel & 0xF].pedalNotes[i] = true;
+    bitSet(pressed, channel & 0xF);
+    for (size_t i=0; i<4; i++) // Transfer all channel pre-pedal notes to pedal notes
+        pedalNotes[channel & 0xF][i] = prePedalNotes[channel & 0xF][i];
 }
 
 // Emulate the pedal being released
 void MidiSostenutoPedal::release(uint8_t channel) {
-    pedals[channel & 0xF].pressed = false;
-    for (size_t i=0; i<128; i++) {
-        pedals[channel & 0xF].pedalNotes[i] = false;
-        if (pedals[channel & 0xF].heldNotes[i]) {
-            pedals[channel & 0xF].heldNotes[i] = false;
+    bitClear(pressed, channel & 0xF);
+    for (size_t i=0; i<128; i++) { // Send Note Off messages for all channel held notes
+        bitClear(pedalNotes[channel & 0xF][i / 32], i % 32); // Reset channel pedal notes
+        if (bitRead(heldNotes[channel & 0xF][i / 32], i % 32)) {
+            bitClear(heldNotes[channel & 0xF][i / 32], i % 32);
             handleNoteOff(channel, i);
         }
     }
@@ -36,17 +34,17 @@ void MidiSostenutoPedal::release(uint8_t channel) {
 
 // Process a MIDI Note On message
 void MidiSostenutoPedal::noteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
-    pedals[channel & 0xF].prePedalNotes[note & 0x7F] = true;
-    if (pedals[channel & 0xF].pressed)
-        pedals[channel & 0xF].heldNotes[note & 0x7F] = false;
+    bitSet(prePedalNotes[channel & 0xF][(note & 0x7F) / 32], (note & 0x7F) % 32); // Remember as channel pre-pedal note
+    if (bitRead(pressed, channel & 0xF)) // If pedal pressed, reset channel held note
+        bitClear(heldNotes[channel & 0xF][(note & 0x7F) / 32], (note & 0x7F) % 32);
     handleNoteOn(channel, note, velocity);
 }
 
 // Process a MIDI Note Off message
 void MidiSostenutoPedal::noteOff(uint8_t channel, uint8_t note) {
-    pedals[channel & 0xF].prePedalNotes[note & 0x7F] = false;
-    if (pedals[channel & 0xF].pressed && pedals[channel & 0xF].pedalNotes[note & 0x7F])
-        pedals[channel & 0xF].heldNotes[note & 0x7F] = true;
+    bitClear(prePedalNotes[channel & 0xF][(note & 0x7F) / 32], (note & 0x7F) % 32); // Reset channel pre-pedal note
+    if (bitRead(pressed, channel & 0xF) && bitRead(pedalNotes[channel & 0xF][(note & 0x7F) / 32], (note & 0x7F) % 32))
+        bitSet(heldNotes[channel & 0xF][(note & 0x7F) / 32], (note & 0x7F) % 32);
     else
         handleNoteOff(channel, note);
 }

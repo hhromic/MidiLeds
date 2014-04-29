@@ -20,9 +20,7 @@ class MidiSoftPedal {
         void setHandleNoteOn(void (*fptr)(uint8_t channel, uint8_t note, uint8_t velocity));
     private:
         float softenFactor;
-        struct {
-            bool pressed;
-        } pedals[16];
+        uint16_t pressed;
         void (*handleNoteOn)(uint8_t channel, uint8_t note, uint8_t velocity);
 };
 
