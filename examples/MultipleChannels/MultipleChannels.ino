@@ -18,8 +18,8 @@
 #include <FastLED.h>
 #include <MidiLeds.h>
 #include <MidiDamperPedal.h>
-#include <MidiSoftPedal.h>
 #include <MidiSostenutoPedal.h>
+#include <MidiSoftPedal.h>
 
 // Program configuration
 #define DATA_PIN 2          // LED strip data pin
@@ -48,8 +48,8 @@ const size_t ML_INDEX[16] = { // From left-to-right put a correlative index (sta
 #define CC_ALL_NOTES_OFF          0x7B
 #define CC_RESET_ALL_CONTROLLERS  0x79
 #define CC_DAMPER_PEDAL           0x40
-#define CC_SOFT_PEDAL             0x42
-#define CC_SOSTENUTO_PEDAL        0x43
+#define CC_SOSTENUTO_PEDAL        0x42
+#define CC_SOFT_PEDAL             0x43
 
 //***********************************************************************
 // Global objects
@@ -58,8 +58,8 @@ elapsedMillis elapsedTime;
 CRGB leds[NOTE_MAX - NOTE_MIN + 1];
 MidiLeds midiLeds[NUM_CHANNELS];
 MidiDamperPedal damperPedal;
-MidiDamperPedal softPedal;
-MidiDamperPedal sostenutoPedal;
+MidiSoftPedal softPedal;
+MidiSostenutoPedal sostenutoPedal;
 
 //***********************************************************************
 // Main setup and loop functions
@@ -182,13 +182,13 @@ void onControlChange(uint8_t channel, uint8_t control, uint8_t value)  {
             if (value < 0x40) damperPedal.release(channel - 1);
             else damperPedal.press(channel - 1);
             break;
-        case CC_SOFT_PEDAL:
-            if (value < 0x40) softPedal.release(channel - 1);
-            else softPedal.press(channel - 1);
-            break;
         case CC_SOSTENUTO_PEDAL:
             if (value < 0x40) sostenutoPedal.release(channel - 1);
             else sostenutoPedal.press(channel - 1);
+            break;
+        case CC_SOFT_PEDAL:
+            if (value < 0x40) softPedal.release(channel - 1);
+            else softPedal.press(channel - 1);
             break;
     }
     digitalWrite(STATUS_LED_PIN, LOW);
