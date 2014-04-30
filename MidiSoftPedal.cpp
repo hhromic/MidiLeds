@@ -10,7 +10,7 @@ MidiSoftPedal::MidiSoftPedal() {
 
 // Set the soften factor to apply to the note velocities (must be <= 1)
 void MidiSoftPedal::setSoftenFactor(float factor) {
-    if (softenFactor <= 1.0f)
+    if (softenFactor >= 0.0f && softenFactor <= 1.0f)
         softenFactor = factor;
 }
 
