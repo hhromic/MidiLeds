@@ -45,8 +45,8 @@ setColorMapper	KEYWORD2
 setFixedHue	KEYWORD2
 setIgnoreVelocity	KEYWORD2
 setBaseBrightness	KEYWORD2
-allNotesOff	KEYWORD2
-resetAllControllers	KEYWORD2
+allLedsOff	KEYWORD2
+reset	KEYWORD2
 setSoftenFactor	KEYWORD2
 press	KEYWORD2
 release	KEYWORD2

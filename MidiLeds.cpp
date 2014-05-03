@@ -13,8 +13,8 @@ void MidiLeds::useLeds(struct CRGB *leds, uint8_t noteMin, uint8_t noteMax) {
     this->noteMax = noteMax;
     midiColorMapper.setNoteMin(noteMin);
     midiColorMapper.setNoteMax(noteMax);
-    allNotesOff();
-    resetAllControllers();
+    allLedsOff();
+    reset();
 }
 
 // Parameter getters
