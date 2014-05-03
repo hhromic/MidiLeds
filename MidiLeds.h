@@ -47,8 +47,8 @@ class MidiLeds {
         // Event handlers
         void noteOn(uint8_t note, uint8_t velocity);
         void noteOff(uint8_t note);
-        void allNotesOff(void);
-        void resetAllControllers(void);
+        void allLedsOff(void);
+        void reset(void);
         void tick(unsigned long time);
     private:
         uint8_t noteMin;

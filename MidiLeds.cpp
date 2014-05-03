@@ -48,7 +48,7 @@ void MidiLeds::setFixedHue(uint8_t hue) {
 void MidiLeds::setIgnoreVelocity(bool state) { parameters.ignoreVelocity = state; }
 void MidiLeds::setBaseBrightness(uint8_t value) { parameters.baseBrightness = value; }
 
-// Process a MIDI Note On message
+// Process a Note On message
 void MidiLeds::noteOn(uint8_t note, uint8_t velocity) {
     if (note >= noteMin && note <= noteMax) {
         hsvData[note] = midiColorMapper.map(note, parameters.ignoreVelocity ? 0x7F : velocity);
@@ -56,22 +56,22 @@ void MidiLeds::noteOn(uint8_t note, uint8_t velocity) {
     }
 }
 
-// Process a MIDI Note Off message
+// Process a Note Off message
 void MidiLeds::noteOff(uint8_t note) {
     if (note >= noteMin && note <= noteMax)
         adsrEnvelopes[note].noteOff();
 }
 
-// Process a MIDI All Notes Off message
-void MidiLeds::allNotesOff(void) {
+// Turn off all Leds
+void MidiLeds::allLedsOff(void) {
     for (size_t i=0; i<0x7F; i++) {
         adsrEnvelopes[i].noteOff();
         hsvData[i] = CHSV(0,0,0);
     }
 }
 
-// Process a MIDI Reset All Controllers message
-void MidiLeds::resetAllControllers(void) {
+// Reset all parameters to their defaults
+void MidiLeds::reset(void) {
     parameters = DEFAULTS;
 }
 
