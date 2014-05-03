@@ -38,7 +38,7 @@
 #define CC_RELEASE_TIME           0x1A
 #define CC_IGNORE_VELOCITY        0x1B
 #define CC_BASE_BRIGHTNESS        0x1C
-#define CC_ALL_NOTES_OFF          0x7B
+#define CC_ALL_SOUND_OFF          0x78
 #define CC_RESET_ALL_CONTROLLERS  0x79
 #define CC_DAMPER_PEDAL           0x40
 #define CC_SOSTENUTO_PEDAL        0x42
@@ -163,8 +163,13 @@ void onControlChange(uint8_t channel, uint8_t control, uint8_t value)  {
             case CC_RELEASE_TIME: midiLeds.setReleaseTime(round(TIME_RANGE * (value * 1.0f / 0x7F))); break;
             case CC_IGNORE_VELOCITY: midiLeds.setIgnoreVelocity(value < 0x40 ? false : true); break;
             case CC_BASE_BRIGHTNESS: midiLeds.setBaseBrightness(value); initNotes(); break;
-            case CC_ALL_NOTES_OFF: midiLeds.allNotesOff(); break;
-            case CC_RESET_ALL_CONTROLLERS: midiLeds.resetAllControllers(); break;
+            case CC_ALL_SOUND_OFF:
+                midiLeds.allLedsOff();
+                damperPedal.release(channel - 1);
+                sostenutoPedal.release(channel - 1);
+                softPedal.release(channel - 1);
+                break;
+            case CC_RESET_ALL_CONTROLLERS: midiLeds.reset(); break;
             case CC_DAMPER_PEDAL:
                 if (value < 0x40) damperPedal.release(channel - 1);
                 else damperPedal.press(channel - 1);
