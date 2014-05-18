@@ -21,7 +21,7 @@ void MidiDamperPedal::release(uint8_t channel) {
     for (size_t i=0; i<128; i++) { // Send Note Off messages for all channel held notes
         if (bitRead(heldNotes[channel & 0xF][i / 32], i % 32)) {
             bitClear(heldNotes[channel & 0xF][i / 32], i % 32);
-            handleNoteOff(channel, i);
+            handleNoteOff(channel, i, 0x00);
         }
     }
 }
@@ -34,11 +34,11 @@ void MidiDamperPedal::noteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
 }
 
 // Process a MIDI Note Off message
-void MidiDamperPedal::noteOff(uint8_t channel, uint8_t note) {
+void MidiDamperPedal::noteOff(uint8_t channel, uint8_t note, uint8_t velocity) {
     if (bitRead(pressed, channel & 0xF)) // If pedal pressed, hold channel Note Off message
         bitSet(heldNotes[channel & 0xF][(note & 0x7F) / 32], (note & 0x7F) % 32);
     else
-        handleNoteOff(channel, note);
+        handleNoteOff(channel, note, velocity);
 }
 
 // Set a handler for processed Note On messages
@@ -47,6 +47,6 @@ void MidiDamperPedal::setHandleNoteOn(void (*fptr)(uint8_t channel, uint8_t note
 }
 
 // Set a handler for processed Note Off messages
-void MidiDamperPedal::setHandleNoteOff(void (*fptr)(uint8_t channel, uint8_t note)) {
+void MidiDamperPedal::setHandleNoteOff(void (*fptr)(uint8_t channel, uint8_t note, uint8_t velocity)) {
     handleNoteOff = fptr;
 }

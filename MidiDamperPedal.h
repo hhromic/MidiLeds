@@ -16,14 +16,14 @@ class MidiDamperPedal {
         void press(uint8_t channel);
         void release(uint8_t channel);
         void noteOn(uint8_t channel, uint8_t note, uint8_t velocity);
-        void noteOff(uint8_t channel, uint8_t note);
+        void noteOff(uint8_t channel, uint8_t note, uint8_t velocity);
         void setHandleNoteOn(void (*fptr)(uint8_t channel, uint8_t note, uint8_t velocity));
-        void setHandleNoteOff(void (*fptr)(uint8_t channel, uint8_t note));
+        void setHandleNoteOff(void (*fptr)(uint8_t channel, uint8_t note, uint8_t velocity));
     private:
         uint16_t pressed;
         uint32_t heldNotes[16][4];
         void (*handleNoteOn)(uint8_t channel, uint8_t note, uint8_t velocity);
-        void (*handleNoteOff)(uint8_t channel, uint8_t note);
+        void (*handleNoteOff)(uint8_t channel, uint8_t note, uint8_t velocity);
 };
 
 #endif

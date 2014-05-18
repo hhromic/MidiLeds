@@ -27,7 +27,7 @@ void MidiSostenutoPedal::release(uint8_t channel) {
         bitClear(pedalNotes[channel & 0xF][i / 32], i % 32); // Reset channel pedal notes
         if (bitRead(heldNotes[channel & 0xF][i / 32], i % 32)) {
             bitClear(heldNotes[channel & 0xF][i / 32], i % 32);
-            handleNoteOff(channel, i);
+            handleNoteOff(channel, i, 0x00);
         }
     }
 }
@@ -41,12 +41,12 @@ void MidiSostenutoPedal::noteOn(uint8_t channel, uint8_t note, uint8_t velocity)
 }
 
 // Process a MIDI Note Off message
-void MidiSostenutoPedal::noteOff(uint8_t channel, uint8_t note) {
+void MidiSostenutoPedal::noteOff(uint8_t channel, uint8_t note, uint8_t velocity) {
     bitClear(prePedalNotes[channel & 0xF][(note & 0x7F) / 32], (note & 0x7F) % 32); // Reset channel pre-pedal note
     if (bitRead(pressed, channel & 0xF) && bitRead(pedalNotes[channel & 0xF][(note & 0x7F) / 32], (note & 0x7F) % 32))
         bitSet(heldNotes[channel & 0xF][(note & 0x7F) / 32], (note & 0x7F) % 32);
     else
-        handleNoteOff(channel, note);
+        handleNoteOff(channel, note, velocity);
 }
 
 // Set a handler for processed Note On messages
@@ -55,6 +55,6 @@ void MidiSostenutoPedal::setHandleNoteOn(void (*fptr)(uint8_t channel, uint8_t n
 }
 
 // Set a handler for processed Note Off messages
-void MidiSostenutoPedal::setHandleNoteOff(void (*fptr)(uint8_t channel, uint8_t note)) {
+void MidiSostenutoPedal::setHandleNoteOff(void (*fptr)(uint8_t channel, uint8_t note, uint8_t velocity)) {
     handleNoteOff = fptr;
 }
