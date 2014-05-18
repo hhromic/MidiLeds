@@ -11,14 +11,20 @@
 
 class AdsrEnvelope {
     public:
+        // Class constructor
         AdsrEnvelope();
+        
+        // Public methods
         void noteOn(unsigned long attackTime, unsigned long decayTime, float sustainLevel, unsigned long releaseTime);
         void noteOff(void);
         void tick(unsigned long time);
         float getOutput(void);
         bool isIdle(void);
     private:
+        // Possible envelope states
         enum States { IDLE, ATTACK, DECAY, SUSTAIN, RELEASE };
+        
+        // Internal envelope data
         struct Data {
             States state;
             float output;

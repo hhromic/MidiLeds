@@ -1,9 +1,8 @@
 #include <cmath>
 #include <AdsrEnvelope.h>
 
-// Class constructor
+// Class constructor/initialisation
 AdsrEnvelope::AdsrEnvelope() {
-    // Initialise the new ADSR envelope
     data = {
         .state = AdsrEnvelope::IDLE,
         .output = 0.0f,
