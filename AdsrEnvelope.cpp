@@ -6,6 +6,7 @@ AdsrEnvelope::AdsrEnvelope() {
     // Initialise the new ADSR envelope
     data = {
         .state = AdsrEnvelope::IDLE,
+        .output = 0.0f,
         .lastTime = 0U,
         .target = 0.0f,
         .attackRate = 0.0f,
@@ -15,20 +16,19 @@ AdsrEnvelope::AdsrEnvelope() {
         .releaseStart = 0.0f,
         .releaseRate = 0.0f,
         .releaseTime = 0U,
-        .output = 0.0f
     };
 }
 
 // Start the ADSR envelope with given parameters
 void AdsrEnvelope::noteOn(unsigned long attackTime, unsigned long decayTime, float sustainLevel, unsigned long releaseTime) {
     data.state = AdsrEnvelope::ATTACK;
+    data.output = 0.0f;
     data.lastTime = 0U;
     data.target = 1.0f;
     data.attackRate = 1.0f / attackTime;
     data.decayRate = (1.0f - sustainLevel) / decayTime;
     data.sustainLevel = sustainLevel;
     data.releaseTime = releaseTime;
-    data.output = 0.0f;
 }
 
 // Trigger the release phase of the ADSR envelope
@@ -43,10 +43,10 @@ void AdsrEnvelope::noteOff(void) {
 }
 
 // Update the ADSR envelope phase and output value (assumes monotonically increasing time)
-// Returns false if the ADSR envelope is in IDLE state, false otherwise
-bool AdsrEnvelope::tick(unsigned long time) {
+void AdsrEnvelope::tick(unsigned long time) {
     // Do nothing if the envelope is idle
-    if (data.state == AdsrEnvelope::IDLE) return false;
+    if (data.state == AdsrEnvelope::IDLE)
+        return;
 
     // Handle envelope relative time
     if (data.lastTime == 0U)
@@ -59,35 +59,42 @@ bool AdsrEnvelope::tick(unsigned long time) {
             data.output = std::isinf(data.attackRate) ? data.target : relativeTime * data.attackRate;
             if (data.output >= data.target) { // Change to decay phase?
                 data.state = AdsrEnvelope::DECAY;
+                data.output = data.target;
                 data.lastTime = 0U;
                 data.decayStart = data.target;
-                data.output = data.target;
                 data.target = data.sustainLevel;
             }
-            return true;
+            break;
         case AdsrEnvelope::DECAY: // Decay phase
             data.output = std::isinf(data.decayRate) ? data.target : data.decayStart - (relativeTime * data.decayRate);
             if (data.output <= data.target) { // Change to sustain phase?
                 data.state = AdsrEnvelope::SUSTAIN;
-                data.lastTime = 0U;
                 data.output = data.target;
+                data.lastTime = 0U;
             }
-            return true;
+            break;
         case AdsrEnvelope::SUSTAIN: // Sustain phase
             data.lastTime = 0U;
-            return true;
+            if (data.output == 0.0) // Skip to idle phase?
+                data.state = AdsrEnvelope::IDLE;
+            break;
         case AdsrEnvelope::RELEASE: // Release phase
             data.output = std::isinf(data.releaseRate) ? data.target : data.releaseStart - (relativeTime * data.releaseRate);
             if (data.output <= data.target) { // Change to idle phase?
                 data.state = AdsrEnvelope::IDLE;
-                data.lastTime = 0U;
                 data.output = data.target;
+                data.lastTime = 0U;
             }
-            return true;
+            break;
     }
 }
 
 // Get the current ADSR envelope output value
 float AdsrEnvelope::getOutput(void) {
     return data.output;
+}
+
+// Test if the ADSR envelope is in idle state
+bool AdsrEnvelope::isIdle(void) {
+    return data.state == AdsrEnvelope::IDLE;
 }

@@ -14,12 +14,14 @@ class AdsrEnvelope {
         AdsrEnvelope();
         void noteOn(unsigned long attackTime, unsigned long decayTime, float sustainLevel, unsigned long releaseTime);
         void noteOff(void);
-        bool tick(unsigned long time);
+        void tick(unsigned long time);
         float getOutput(void);
+        bool isIdle(void);
     private:
         enum States { IDLE, ATTACK, DECAY, SUSTAIN, RELEASE };
         struct Data {
             States state;
+            float output;
             unsigned long lastTime;
             float target;
             float attackRate;
@@ -29,7 +31,6 @@ class AdsrEnvelope {
             float releaseStart;
             float releaseRate;
             unsigned long releaseTime;
-            float output;
         } data;
 };
 
