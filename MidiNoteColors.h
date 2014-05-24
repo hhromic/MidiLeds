@@ -13,6 +13,7 @@
 
 class MidiNoteColors {
     public:
+        // Available note color maps
         enum Maps {
             AEPPLI_1940,
             BELMONT_1944,
@@ -28,9 +29,15 @@ class MidiNoteColors {
             SEEMANN_1881,
             ZIEVERINK_2004,
         };
+        
+        // Public methods
         static struct CHSV get(Maps map, uint8_t note);
+
     private:
-        MidiNoteColors(); // No need to instantiate this class
+        // Class constructor -- no need to instantiate this class
+        MidiNoteColors();
+        
+        // Color data
         const static struct CHSV colorData[13][12];
 };
 
