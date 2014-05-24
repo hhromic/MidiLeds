@@ -20,6 +20,7 @@ class AdsrEnvelope {
         void tick(unsigned long time);
         float getOutput(void);
         bool isIdle(void);
+
     private:
         // Possible envelope states
         enum States { IDLE, ATTACK, DECAY, SUSTAIN, RELEASE };
