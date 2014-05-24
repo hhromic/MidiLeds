@@ -16,10 +16,10 @@ class MidiColorMapper {
     public:
         // Available color mappers
         enum Mappers { COLOR_MAP, RAINBOW, FIXED_COLOR };
-        
+
         // Class constructor
         MidiColorMapper();
-        
+
         // Getter/setters
         uint8_t getNoteMin(uint8_t channel);
         void setNoteMin(uint8_t channel, uint8_t noteMin);
@@ -33,7 +33,7 @@ class MidiColorMapper {
         void setFixedHue(uint8_t channel, uint8_t fixedHue);
         bool isIgnoreVelocity(uint8_t channel);
         void setIgnoreVelocity(uint8_t channel, bool state);
-        
+
         // Public methods
         struct CHSV map(uint8_t channel, uint8_t note, uint8_t velocity);
         void reset(uint8_t channel);
@@ -48,7 +48,7 @@ class MidiColorMapper {
             uint8_t fixedHue;
             bool ignoreVelocity;
         } parameters[16];
-        
+
         // Default parameters settings
         const struct MidiColorMapperParameters DEFAULTS = {
             .noteMin = 0x00,

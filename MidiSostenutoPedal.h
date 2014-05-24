@@ -14,7 +14,7 @@ class MidiSostenutoPedal {
     public:
         // Class constructor
         MidiSostenutoPedal();
-        
+
         // Public methods
         void press(uint8_t channel);
         void release(uint8_t channel);
@@ -29,7 +29,7 @@ class MidiSostenutoPedal {
         uint32_t prePedalNotes[16][4];
         uint32_t pedalNotes[16][4];
         uint32_t heldNotes[16][4];
-        
+
         // MIDI message handlers
         void (*handleNoteOn)(uint8_t channel, uint8_t note, uint8_t velocity);
         void (*handleNoteOff)(uint8_t channel, uint8_t note, uint8_t velocity);

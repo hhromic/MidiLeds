@@ -14,7 +14,7 @@ class MidiDamperPedal {
     public:
         // Class constructor
         MidiDamperPedal();
-        
+
         // Public methods
         void press(uint8_t channel);
         void release(uint8_t channel);
@@ -27,7 +27,7 @@ class MidiDamperPedal {
         // Internal bit-wise states
         uint16_t pressed;
         uint32_t heldNotes[16][4];
-        
+
         // MIDI message handlers
         void (*handleNoteOn)(uint8_t channel, uint8_t note, uint8_t velocity);
         void (*handleNoteOff)(uint8_t channel, uint8_t note, uint8_t velocity);

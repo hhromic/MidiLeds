@@ -18,7 +18,7 @@ class MidiSoftPedal {
         // Getter/setters
         float getSoftenFactor(void);
         void setSoftenFactor(float factor);
-        
+
         // Public methods
         void press(uint8_t channel);
         void release(uint8_t channel);
